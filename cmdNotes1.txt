@@ -1,0 +1,277 @@
+pwd --> iam working on which directory
+ls --> contents
+ls -l --> get permissions for files and folders
+nano --> edit a file
+touch --> create empty file
+which --> to know if the command exist or not
+rm --> delete file
+rm test* --> remove any file starting with test as test11 
+rmdir --> remove directory
+cat --> see contents of the file
+cp --> copy file from one loc to another
+mv --> move file from one loc to another 
+cd .. --> go back one step
+rename a file  --> mv filename newName
+ls -a --> show hidden files 
+man 'commandName' --> show the description of the command
+'commandName' --help --> show the description for -
+Permissions :
+	 --> User , group , everybody else(other users) rwx: r->read w->write x->execute   ugo:  u->user g->group o->others
+	chmod +rwx file --> add permissions to everybody user and group
+	chmod -rwx file --> remove permisssion
+	chmod u+x file --> adding permission to user only 
+	chmod a+rwx file --> adding all permissions to all people
+	for directory --> rwx: r-> able to see contents w->able to change contents x->able to enter directory
+Users :
+	etc/passwd --> users
+	etc/shadow --> passwords in hash
+	etc/group --> groups
+	groups --> to which groups you belong
+	groups user --> what groups does this user belong too
+	sudo adduser name --> to add new user and create group for this user with same name
+	su - user --> change to another user note: require password
+	sudo su - user --> doesnot require password as you are the root
+	logout --> back to main user
+	passwd --> change password for the current user
+	passwd user --> change the passwd for that user
+	sudo passwd --> doesnt ask you for your current password
+	as sudo su - then passwd user no passord is needed
+	sudo su - --> change the user to be the root
+	ctrl + d --> logout
+	sudo userdel -r user --> remove the user (-r also remove the files of the user)
+	sudo groupadd name --> create new group
+	sudo usermod -aG groupname user --> add user to group (you can logout to see your new group in the groups list)
+	sudo groupdel group_name --> delete a group(must be empty)
+	sudo adduser --ingroup group_name user_name --> create new user and add it to group you specifiedd
+    sudo useradd -m ahmed --> create the user with the home directory
+    sudo useradd -m sama --> create user that you cannot login to it
+Network :
+	ifconfig --> show network interfaces (ethernet , loopback , wireless ethernet)
+	ping 'ipAddress' --> make sure that this ip address can be reached
+	tcpdump --> show the packets that are sent and recieved
+	tcpdump -c 10 --> only ten packets	
+	sudo tcpdump -c 10 -n --> show the ip addresses instead of names
+	/etc/hosts --> to search for specific host to get ip address before going to the dns server	
+		enter 'Ipaddress' 'Domain or host name' 'alias'
+Day2 : 
+
+Service : (units)
+	systemctl --> manage services
+	systemctl --> show the services running
+	systemctl status 'serviceName' --> show the status of the service
+	sudo systemctl enable 'serviceName' --> enable service (when booting the service will be running)
+	//   //        disable   //         --> disable service (when booting the service will be inactive)
+	sudo systemctl start apache2 --> start the service (refresh the service)
+	sudo systemctl stop apache2 --> stop the service 
+	sudo systemctl enable --now 'serviceName' --> enable and start the service	
+	sudo systemctl restart 'serviceName' --> take advantage of the modified configurations for the unit
+		service go down and then come back
+	sudo systemctl reload 'serviceName'--> as restart but service doesnot go down (important in case of website used by other users and you dont want the website to be reloaded for them to work again)(it applies the changes to the configurations)
+		cannot be used for all the times as specific modification to configurations require restart the service
+FireWall :
+	firewall-cmd --list-services --> list the service that are allowed for connections by the firewall where if service
+		isnot included in the firewall you cannot make a connection using this service
+	firewall-cmd --add-service=https --> add service during runtime only (removed in case of reboot)
+	firewall-cmd --remove-service=https --> remove service during runtime only (still exist in case of reboot)
+	//	//	//	//	// --permanent --> service is added or removed permenantly
+	firewall-cmd --reload --> as if you made reboot without rebooting
+	**Note: --permanent doesnot add the service during the current runtime must make reboot so if you want it 
+		permenant and applied at current runtime : 1-firewall-cmd --reload	2-firewall-cmd --add-service=https
+		+ firewall-cmd --add-service=https --permanent
+SSH :
+	which ssh --> to check if you have ssh client
+	ssh user@"ipAddress or host" --> connect to remote server
+	tail -f /var/log/auth.log --> see when a session for connection to me has occured "Iam the server"
+	who --> to see who is connecting to which users at my server and their ip address
+	instead of writing user@ipaddress --> 1- create .ssh/config and inside it write 
+						Host "name to be used with ssh"
+							Hostname ipaddress
+							Port 22
+							User elgondi
+					      2- add to /etc/hosts --> ip address of server	alias
+						ssh user@alias
+	
+	-Access the server without password :
+	Hard way :  
+	1-To generate public/private key so that you dont have to enter password everytime you enter the server --> ssh-keygen
+					   but make sure that file that will be saved doesnot already exit in order not to
+					   be overriden so that you dont lose the p/p key of the server.
+		Passphrase --> main purpose is to be able to use the key .. if one knows the key but dont know the
+			       passphrase then he cant enter the server (can be empty)
+	2-make server accept connection via that key -->copy the public key(.pub) and login the user account at the server,
+	  create .ssh dir , nano authorized_keys --> paste the public key then save the file (whoow done no password is
+		   needed).
+	3- when use ssh it checks private key against the public key at the remote end and if there is a match then 
+	   no need for password.	
+	Easy way :
+	after ssh-keygen
+	1- ssh-copy-id -i ~/.ssh/id_rsa.pub elgondi@hostname --> create the .ssh at the server if not found and 
+	   created authorized_keys file and copied the public key to it.
+
+	
+
+	-create key with different type --> ssh-keygen -t ed25519 (more secure & public key is shorter)
+								-C "comment" --> default "elgondi@Legion"
+		then change name of the key to be created --> /home/elgondi/.ssh/"name"
+	
+	
+	-specify which key to use to access the server --> ssh -i ~/.ssh/privateKey elgondi@ipaddress
+	
+	-To add the private key to the memory so that there is no need to enter the passphrase during the 
+	 lifetime of the terminal -->eval "$(ssh-agent)"(create the ssh-agent) then  ssh-add ~/.ssh/priavtekey add the
+	 key to the ssh agent.
+	
+	-Configure Server Component :
+	 -sshd --> service that run in the background that listen for ssh connections.
+	 -systemctl stop sshd --> stop the service (wont terminate any connections in progress)
+	 -systemctl status sshd --> show status of service
+	 -enable the service --> systemctl enable ssh or sshd
+	 -/etc/ssh --> ssh host keys (for fingerprint)
+	 -/etc/ssh/ssh_config -->  for global client config setting along the entire distribution
+	 -/etc/ssh/sshd_config --> configure the server service(process listening to connections)
+		#Port 22 --> Port 2222 to change the listening port
+		#can change port , PasswordAuthontication 
+		#must restart the ssh service after any change
+	 -in case of changing the port no in the conf then every ssh connection must be 
+	  ssh -p "new port number" elgondi@ipaddress
+	 -passwordAuthentication no --> in case of you dont have the private key then you arenot allowed to
+	  enter the server although you have the password of the user it wont allow you to enter it.
+ps command:
+	ps
+	ps -He --> show pids and processes relationships (Parent ,child)
+	ps -axjf --> show processes with parent ids
+		ppid = 0 --> has no parent
+		UID --> user id if = 0 --> root
+	ps -ejH --> show process with tree to each parent
+	ps -eo --> ppid pid user
+	ps -t "terminal" --> get processes for specific terminal
+	ps -U "user" --> show me the processes of specific user
+	top --> show the running processes live
+	ps aux --> shows processes running
+	ps -ef --> show the ppid
+	kill -9 <pid> --> forcely kill the process , can lead to some resources remain locked --> use as a last option
+	kill -15 <pid> --> kill the process but after releasing the resources (finish any ongoing task and save the state)
+	kill -19 <pid> --> stop the process
+	pkill <process name> --> pkill firefox or pkill nano
+SUID :
+	-As an owner , i make everyone on the server run the script as if it
+	is me.
+	-suid --> if it is set this means that the command will be run as the
+	owner of the file (this means that the program always run with the 
+	permissions of the owner)	
+	-SUID set --> chmod ()777 --> 4=SUID 2=SGID 1=stickybit --> ex:4777
+		can be 6777 --> suid and sgid	can be removed by 0777
+	-know the files that have suid and guid bit set -->
+			find / -perm -6000
+	-search for files with usid bit set ->find / -perm -4000 2>/dev/null --> any error appear redirect to dev/null dont make
+	it appear.
+	-search for files with ugid bit set ->find  -perm -2000 2>dev/null
+	
+GUID :
+	you give the permission to others to run the script as if he is
+	member of the group.
+
+grep , xargs :
+	-grep --> regular expression take the output of the previous command 
+	as an input and shows the files or directories that matches the 
+	pattern provided. ex: ls -la | grep .txt
+	-xargs : takes the output of prev command and convert it to arguments
+	to the following command. ex : 
+		find / -perm -4000 2>/dev/null | xargs ls -la 
+Reset password :
+	-At first you have to reboot the system , during the booting press specific key i guess shift
+	then the bootloader screen will show to you (grub) select the kernel and press e to change
+	the kernel parameters for booting .. add rd.break to enter the emergency shell which is before
+	mounting of the root filesystem .. remount the filesystem to sysroot with read write 
+	permission and change the root to that directory by chroot .. change password and make sure
+	to add .autorlabel for security labeling and then exit twice to enter the boot mode again.
+	-steps found in redhat documentation admin 2 
+
+Partitioning : 
+	-lsblk --> list the block devices that attached to linux workstation
+	-sd_ --> name of devices attached to linux --> ls -l /dev/sd_
+	-when adding new device as flash disk it will appear in the lsblk
+	-sudo fdisk -l --> also list the partitions of the storage devices.
+	-mount --> list all of the mounted storage devices on the system.
+	-umount --> unmount a filesystem === making it unaccessible to the os and applications.
+		sudo umount /dev/devicePartition
+		sudo umount mountPoint in lsblk
+	Note : Methods for partitioning the disk -> mbr , gpt
+		GPT -> support up to 128 partitions , partition size up to 9.4 zettabytes .
+		MBR -> support up to 4 partitons , partition size up to 2TB .
+	-To create partitions for the device :(partition the device)
+		1-unmount the device --> umount
+		2-show the device --> sudo fdisk /dev/device
+		3-create new partition table entering (g)
+		4-p to see the disk info
+		5-n to add partitions to the partition table
+		6-w to make the changes final
+		7-format the partition -->attach a file system to it.
+			sudo mkfs(makefilesystem).filesystem /dev/partition 
+				ex : sudo mkfs.exfat /dev/sda1
+				or   sudo mkfs.exfat -n "Labelname" /dev/sda1 (appear in lsblk mount point with the label)
+	-display the storage devices with remaining space : df -h
+	-Mount (manually) : attach the device to a folder in the system (in case of mounting a storage to a server)
+		mount prefered to be done using two folders (create each folder for mounting each device inside these): 
+			1-/media --> temporary storage ex:flash contain backup for server needed for backup
+			2-/mnt -->permenant filesystems ex: adding second hard disk to server.
+		steps:
+			1- sudo mkdir /mnt/newfolder
+			2- sudo mount /dev/sda1 /mnt/newfolder.
+			-not read write permissions
+			-to get read write permissions-->
+			sudo mount /dev/sda /mnt/mount1 -o rw,uid=1000,gid=1000,dmask=022(bl3aks),fmask=000(bl3aks=777(allper))
+	Note : to avoid losing data from the partition umount the partition before removing the usb			
+		
+	Note : Common Filesystems
+
+	ext2 (Second Extended Filesystem)
+	Command: mkfs.ext2
+	Suitable for: Legacy systems or environments where journaling is not required.
+
+	ext3 (Third Extended Filesystem)
+	Command: mkfs.ext3
+	Suitable for: Systems where journaling is required for improved reliability over ext2.
+
+	ext4 (Fourth Extended Filesystem)
+	Command: mkfs.ext4
+	Suitable for: Modern Linux systems, offering improvements in performance, scalability, and reliability over ext3.
+
+	XFS
+	Command: mkfs.xfs
+	Suitable for: High-performance systems requiring fast throughput and scalability, such as large-scale file servers.
+
+	btrfs (B-tree Filesystem)
+	Command: mkfs.btrfs
+	Suitable for: Advanced filesystem features like snapshots, dynamic inode allocation, and integrated multi-device spanning.
+
+	FAT32 (File Allocation Table)
+	Command: mkfs.vfat
+	Suitable for: Cross-platform compatibility, especially for USB drives and memory cards.
+
+	NTFS (New Technology File System)
+	Command: mkfs.ntfs
+	Suitable for: Compatibility with Windows systems, particularly for large file support and advanced features.
+
+	exFAT (Extended File Allocation Table)
+	Command: mkfs.exfat
+	Suitable for: Large files and cross-platform compatibility, often used for flash drives and external hard drives.
+
+	ReiserFS
+	Command: mkfs.reiserfs
+	Suitable for: Systems requiring efficient handling of small files and fast journaling capabilities.
+
+	JFS (Journaled File System)
+	Command: mkfs.jfs
+	Suitable for: High-performance systems requiring low CPU overhead and fast recovery times.
+
+	HFS+ (Hierarchical File System Plus)
+	Command: mkfs.hfsplus
+	ISO9660 (CD-ROM Filesystem)
+	Command: mkfs.iso9660
+	Suitable for: Creating filesystems on optical media like CDs and DVDs.
+
+	UDF (Universal Disk Format)
+	Command: mkfs.udf
+	Suitable for: Creating filesystems on optical media with support for packet writing, such as DVDs and Blu-ray 
+	discs.
