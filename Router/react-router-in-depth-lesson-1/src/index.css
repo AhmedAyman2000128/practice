@@ -1,0 +1,121 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
+
+:root {
+  --primary: #bc4123;
+  --secondary: #2b3452;
+}
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: "Poppins";
+  background: var(--secondary);
+}
+* {
+  color: #fff;
+  margin: 0;
+}
+p {
+  margin: 20px 0;
+}
+button {
+  border: 0;
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+  background: var(--primary);
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+  padding: 10px;
+  font-size: 20px;
+}
+/* navbar */
+main {
+  margin: 50px auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+header h1 {
+  width: 100px;
+  font-weight: bold;
+}
+header nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+header a.active {
+  background-color: orange;
+  border-radius: 5px;
+  color: blueviolet;
+}
+
+/* page content */
+
+/* help layout */
+.help-layout p {
+  text-align: center;
+}
+.help-layout nav {
+  display: flex;
+  margin: 0 auto;
+  width: fit-content;
+  gap: 100px;
+}
+.help-layout nav a {
+  border: 3px solid white;
+}
+.help-layout nav a.active {
+  background-color: white;
+  color: blueviolet;
+}
+/* faq */
+.faq .question {
+  padding: 10px;
+  background-color: rgb(91, 91, 235);
+  margin: 20px;
+  border-radius: 5px;
+}
+/* Contact */
+.contact form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+}
+.contact form label {
+  display: flex;
+  flex-direction: column;
+}
+.contact form label input,
+.contact form label textarea {
+  width: 50%;
+}
+.contact form label input {
+  height: 50px;
+}
+.contact form label textarea {
+  height: 300px;
+}
+/* careers list */
+.careers div h3 {
+  padding: 0;
+  margin: 0;
+}
+.careers div {
+  background-color: #1b2133;
+  margin: 0 0 10px 0;
+  border-radius: 20px;
+  padding-left: 50px;
+  cursor: pointer;
+}
+.careers div:hover h3 {
+  color: rgb(137, 17, 17);
+}
+/* careers details */
+
+/* breadcrumbs */
